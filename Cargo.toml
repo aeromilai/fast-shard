@@ -40,6 +40,10 @@ rustversion = "1.0"
 name = "shard_benchmark"
 harness = false
 
+[[bench]]
+name = "hash_comparison"
+harness = false
+
 [profile.release]
 lto = true        # Enable link-time optimization
 codegen-units = 1 # Optimize for size and speed
