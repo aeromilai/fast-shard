@@ -14,7 +14,17 @@ fn create_single_algo_config(algo: ShardAlgorithm) -> ShardConfig {
 }
 
 pub fn bench_hash_algorithms(c: &mut Criterion) {
-    let test_sizes = vec![16, 32, 256, 512, 1024, 4096, 32768];
+    let test_sizes = vec![
+        4,    // 4 bytes
+        8,    // 8 bytes
+        16,   // 16 bytes
+        32,   // 32 bytes
+        256,  // 256 bytes
+        512,  // 512 bytes
+        1024, // 1KB
+        4096, // 4KB
+        32768 // 32KB
+    ];
     let algorithms = vec![
         ("AVX512", ShardAlgorithm::Avx512),
         ("AVX2", ShardAlgorithm::Avx2),
