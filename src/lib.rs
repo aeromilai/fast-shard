@@ -47,7 +47,7 @@ impl Default for ShardConfig {
                     algorithms: small_key_algorithms,
                 },
                 ShardTier {
-                    size_range: 17..usize::MAX,
+                    size_range: 17..=usize::MAX,
                     algorithms: large_key_algorithms,
                 },
             ],
