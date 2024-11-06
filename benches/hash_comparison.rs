@@ -6,7 +6,7 @@ fn create_single_algo_config(algo: ShardAlgorithm) -> ShardConfig {
         tiers: vec![
             ShardTier {
                 size_range: 0..=usize::MAX,
-                algorithms: vec![algo],
+                algorithms: vec![algo.clone()],
             },
         ],
         default_algorithms: vec![algo],
