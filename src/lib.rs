@@ -57,12 +57,12 @@ impl Default for ShardConfig {
 }
 
 #[derive(Debug)]
-pub struct FastShard {
+pub struct fast_shard {
     shard_count: u32,
     config: ShardConfig,
 }
 
-impl FastShard {
+impl fast_shard {
     pub fn new(shard_count: u32) -> Self {
         Self {
             shard_count,
