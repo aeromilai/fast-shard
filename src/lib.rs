@@ -1,6 +1,6 @@
 // File: src/lib.rs
 use std::ops::RangeInclusive;
-#[cfg(target_arch = "x86_64")]
+#[cfg(all(target_arch = "x86_64", any(target_feature = "avx512f", target_feature = "avx2", target_feature = "aes")))]
 use std::arch::x86_64::*;
 
 #[derive(Debug, Clone, PartialEq)]
