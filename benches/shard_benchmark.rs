@@ -1,8 +1,8 @@
 use criterion::{criterion_group, criterion_main, Criterion};
-use fast_shard::{fast_shard, ShardConfig, ShardTier, ShardAlgorithm};
+use fast_shard::{FastShard, ShardConfig, ShardTier, ShardAlgorithm};
 
 pub fn bench_configured_sharding(c: &mut Criterion) {
-    let default_shard = fast_shard::new(1024);
+    let default_shard = FastShard::new(1024);
     
     let custom_config = ShardConfig {
         tiers: vec![
@@ -18,7 +18,7 @@ pub fn bench_configured_sharding(c: &mut Criterion) {
         default_algorithms: vec![ShardAlgorithm::Xxh3],
     };
     
-    let custom_shard = fast_shard::with_config(1024, custom_config);
+    let custom_shard = FastShard::with_config(1024, custom_config);
     
     let small_key = vec![0u8; 32];
     let large_key = vec![0u8; 512];
