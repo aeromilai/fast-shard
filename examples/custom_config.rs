@@ -1,4 +1,4 @@
-use fast_shard::{fast_shard, ShardConfig, ShardTier, ShardAlgorithm};
+use fast_shard::{FastShard, ShardConfig, ShardTier, ShardAlgorithm};
 
 fn main() {
     // Define custom configuration
@@ -35,7 +35,7 @@ fn main() {
         ],
     };
 
-    let shard = fast_shard::with_config(1024, config);
+    let shard = FastShard::with_config(1024, config);
     
     // Use the configured sharding
     let small_key = b"small key";
