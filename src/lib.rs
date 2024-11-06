@@ -1,6 +1,5 @@
 // File: src/lib.rs
-#![feature(stdsimd)]
-use std::ops::Range;
+use std::ops::RangeInclusive;
 
 #[derive(Debug, Clone, PartialEq)]
 pub enum ShardAlgorithm {
@@ -13,7 +12,7 @@ pub enum ShardAlgorithm {
 
 #[derive(Debug, Clone)]
 pub struct ShardTier {
-    pub size_range: Range<usize>,
+    pub size_range: RangeInclusive<usize>,
     pub algorithms: Vec<ShardAlgorithm>,
 }
 
@@ -103,18 +102,45 @@ impl FastShard {
                 return self.get_available_algorithm(&tier.algorithms);
             }
         }
-        self.get_available_algorithm(&self.default_algorithms)
+        self.get_available_algorithm(&self.config.default_algorithms)
     }
 
     pub fn shard(&self, key: &[u8]) -> u32 {
         let algorithm = self.get_algorithm_for_size(key.len());
         match algorithm {
-            ShardAlgorithm::Avx512 => unsafe { self.shard_avx512(key) },
-            ShardAlgorithm::Avx2 => unsafe { self.shard_avx2(key) },
-            ShardAlgorithm::AesNi => unsafe { self.shard_aesni(key) },
-            ShardAlgorithm::Fnv1a => self.shard_fnv1a(key),
-            ShardAlgorithm::Xxh3 => self.shard_xxh3(key),
+            ShardAlgorithm::Avx512 => self.shard_with_avx512(key),
+            ShardAlgorithm::Avx2 => self.shard_with_avx2(key),
+            ShardAlgorithm::AesNi => self.shard_with_aesni(key),
+            ShardAlgorithm::Fnv1a => self.shard_with_fnv1a(key),
+            ShardAlgorithm::Xxh3 => self.shard_with_xxh3(key),
         }
+    }
+
+    fn shard_with_avx512(&self, key: &[u8]) -> u32 {
+        // TODO: Implement AVX-512 sharding
+        self.shard_with_xxh3(key)
+    }
+
+    fn shard_with_avx2(&self, key: &[u8]) -> u32 {
+        // TODO: Implement AVX2 sharding
+        self.shard_with_xxh3(key)
+    }
+
+    fn shard_with_aesni(&self, key: &[u8]) -> u32 {
+        // TODO: Implement AES-NI sharding
+        self.shard_with_xxh3(key)
+    }
+
+    fn shard_with_fnv1a(&self, key: &[u8]) -> u32 {
+        let mut hasher = fnv::FnvHasher::default();
+        use std::hash::Hasher;
+        hasher.write(key);
+        (hasher.finish() % self.shard_count as u64) as u32
+    }
+
+    fn shard_with_xxh3(&self, key: &[u8]) -> u32 {
+        use xxhash_rust::xxh3::xxh3_64;
+        (xxh3_64(key) % self.shard_count as u64) as u32
     }
 }
 
