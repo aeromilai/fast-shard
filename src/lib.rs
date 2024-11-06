@@ -1,5 +1,7 @@
 // File: src/lib.rs
 use std::ops::RangeInclusive;
+#[cfg(target_arch = "x86_64")]
+use std::arch::x86_64::*;
 
 #[derive(Debug, Clone, PartialEq)]
 pub enum ShardAlgorithm {
@@ -116,18 +118,90 @@ impl FastShard {
         }
     }
 
+    #[cfg(target_feature = "avx512f")]
     fn shard_with_avx512(&self, key: &[u8]) -> u32 {
-        // TODO: Implement AVX-512 sharding
+        unsafe {
+            if is_x86_feature_detected!("avx512f") {
+                let mut hash = 0u32;
+                for chunk in key.chunks(64) {
+                    let vec = if chunk.len() == 64 {
+                        _mm512_loadu_si512(chunk.as_ptr() as *const _)
+                    } else {
+                        let mut padded = [0u8; 64];
+                        padded[..chunk.len()].copy_from_slice(chunk);
+                        _mm512_loadu_si512(padded.as_ptr() as *const _)
+                    };
+                    
+                    let reduced = _mm512_reduce_add_epi32(vec);
+                    hash = hash.wrapping_add(reduced as u32);
+                }
+                hash % self.shard_count
+            } else {
+                self.shard_with_xxh3(key)
+            }
+        }
+    }
+
+    #[cfg(not(target_feature = "avx512f"))]
+    fn shard_with_avx512(&self, key: &[u8]) -> u32 {
         self.shard_with_xxh3(key)
     }
 
+    #[cfg(target_feature = "avx2")]
     fn shard_with_avx2(&self, key: &[u8]) -> u32 {
-        // TODO: Implement AVX2 sharding
+        unsafe {
+            if is_x86_feature_detected!("avx2") {
+                let mut hash = 0u32;
+                for chunk in key.chunks(32) {
+                    let vec = if chunk.len() == 32 {
+                        _mm256_loadu_si256(chunk.as_ptr() as *const _)
+                    } else {
+                        let mut padded = [0u8; 32];
+                        padded[..chunk.len()].copy_from_slice(chunk);
+                        _mm256_loadu_si256(padded.as_ptr() as *const _)
+                    };
+                    
+                    let reduced = _mm256_extract_epi32::<0>(vec) as u32;
+                    hash = hash.wrapping_add(reduced);
+                }
+                hash % self.shard_count
+            } else {
+                self.shard_with_xxh3(key)
+            }
+        }
+    }
+
+    #[cfg(not(target_feature = "avx2"))]
+    fn shard_with_avx2(&self, key: &[u8]) -> u32 {
         self.shard_with_xxh3(key)
     }
 
+    #[cfg(target_feature = "aes")]
     fn shard_with_aesni(&self, key: &[u8]) -> u32 {
-        // TODO: Implement AES-NI sharding
+        unsafe {
+            if is_x86_feature_detected!("aes") {
+                let mut hash = _mm_set1_epi32(0);
+                for chunk in key.chunks(16) {
+                    let data = if chunk.len() == 16 {
+                        _mm_loadu_si128(chunk.as_ptr() as *const _)
+                    } else {
+                        let mut padded = [0u8; 16];
+                        padded[..chunk.len()].copy_from_slice(chunk);
+                        _mm_loadu_si128(padded.as_ptr() as *const _)
+                    };
+                    
+                    hash = _mm_aesenc_si128(hash, data);
+                }
+                let result = _mm_extract_epi32::<0>(hash) as u32;
+                result % self.shard_count
+            } else {
+                self.shard_with_xxh3(key)
+            }
+        }
+    }
+
+    #[cfg(not(target_feature = "aes"))]
+    fn shard_with_aesni(&self, key: &[u8]) -> u32 {
         self.shard_with_xxh3(key)
     }
 
