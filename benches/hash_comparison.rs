@@ -33,7 +33,7 @@ pub fn bench_hash_algorithms(c: &mut Criterion) {
             let shard = FastShard::with_config(1024, config);
             
             group.bench_with_input(
-                BenchmarkId::new(algo_name, size),
+                BenchmarkId::new(*algo_name, size),
                 &test_data,
                 |b, data| {
                     b.iter(|| shard.shard(data));
