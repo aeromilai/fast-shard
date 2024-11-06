@@ -168,6 +168,56 @@ This crate uses `unsafe` code for SIMD operations but maintains safety through:
 - Runtime CPU feature detection when enabled
 - Proper alignment handling
 
+##  Benchmark
+```
+sample benchmarks by running the following: 
+cargo bench --bench hash_comparison
+
+time:   [2.3172 ns 2.3432 ns 2.3756 ns]
+Found 12 outliers among 100 measurements (12.00%)
+  4 (4.00%) high mild
+  8 (8.00%) high severe
+hash_comparison/AVX2/4  time:   [2.2711 ns 2.2934 ns 2.3242 ns]
+Found 4 outliers among 100 measurements (4.00%)
+  2 (2.00%) high mild
+  2 (2.00%) high severe
+hash_comparison/AES-NI/4
+                        time:   [2.2902 ns 2.3002 ns 2.3111 ns]
+Found 5 outliers among 100 measurements (5.00%)
+  3 (3.00%) high mild
+  2 (2.00%) high severe
+hash_comparison/XXH3/4  time:   [2.2938 ns 2.3060 ns 2.3191 ns]
+Found 6 outliers among 100 measurements (6.00%)
+  5 (5.00%) high mild
+  1 (1.00%) high severe
+hash_comparison/FNV1a/4 time:   [2.4171 ns 2.4227 ns 2.4294 ns]
+Found 6 outliers among 100 measurements (6.00%)
+  4 (4.00%) high mild
+  2 (2.00%) high severe
+hash_comparison/AVX512/8
+                        time:   [2.3122 ns 2.3411 ns 2.3753 ns]
+Found 9 outliers among 100 measurements (9.00%)
+  3 (3.00%) high mild
+  6 (6.00%) high severe
+hash_comparison/AVX2/8  time:   [2.3110 ns 2.3273 ns 2.3462 ns]
+Found 9 outliers among 100 measurements (9.00%)
+  5 (5.00%) high mild
+  4 (4.00%) high severe
+hash_comparison/AES-NI/8
+                        time:   [2.2988 ns 2.3104 ns 2.3245 ns]
+Found 6 outliers among 100 measurements (6.00%)
+  2 (2.00%) high mild
+  4 (4.00%) high severe
+hash_comparison/XXH3/8  time:   [2.2962 ns 2.3069 ns 2.3183 ns]
+Found 4 outliers among 100 measurements (4.00%)
+  1 (1.00%) high mild
+  3 (3.00%) high severe
+hash_comparison/FNV1a/8 time:   [3.1421 ns 3.1637 ns 3.1879 ns]
+Found 8 outliers among 100 measurements (8.00%)
+  7 (7.00%) high mild
+  1 (1.00%) high severe
+```
+
 ## Changelog
 
 See [CHANGELOG.md](CHANGELOG.md) for a list of changes.
