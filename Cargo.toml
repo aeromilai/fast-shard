@@ -1,6 +1,6 @@
 [package]
 name = "fast-shard"
-version = "0.1.1"
+version = "0.1.2"
 edition = "2021"
 authors = ["aeromilai"]
 description = "High-performance configurable sharding library with SIMD optimizations"

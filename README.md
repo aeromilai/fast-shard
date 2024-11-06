@@ -20,7 +20,7 @@ A high-performance, configurable sharding library that leverages CPU vector inst
 Add to your `Cargo.toml`:
 ```toml
 [dependencies]
-fast-shard = "0.1.0"
+fast-shard = "0.1.2"
 ```
 
 Basic usage:
